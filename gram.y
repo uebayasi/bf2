@@ -11,6 +11,11 @@ enum {
 	PARAM_ENDIAN = 2,
 };
 
+YYDECL2(list,
+	struct comment *, comment,
+	struct reg *, reg);
+YYDECL1(comment,
+	const char *, text);
 YYDECL3(reg,
 	const char *, prefix,
 	struct paramlist *, paramlist,
@@ -26,6 +31,8 @@ YYDECL2(enumer,
 	int, num,
 	const char *, name);
 
+void proccommentlist(struct commentlist *, void *);
+void proccomment(struct comment *, void *);
 void procreg(struct reg *, void *);
 void procfield(struct field *, void *);
 
@@ -43,16 +50,21 @@ int yywrap(void);
 	struct param *param;
 	struct paramlist *paramlist;
 	struct reg *reg;
-	struct reglist *reglist;
+	struct comment *comment;
+	struct list *list;
+	struct listlist *listlist;
 }
 
+%token	COMMENT
 %token	PREFIX
 %token	SIZE
 %token	ID
 %token	NUMBER
 %token	NEWLINE
 
-%type	<reglist>	reglist
+%type	<listlist>	listlist
+%type	<list>		list
+%type	<comment>	comment
 %type	<reg>		reg
 %type	<paramlist>	paramlist
 %type	<param>		param
@@ -66,20 +78,29 @@ int yywrap(void);
 
 %%
 
-all:
-	reglist
-	{
-		iterreglist($1, procreg, NULL);
-	}
-
-reglist:
+listlist:
 	{
 		$$ = NULL;
 	}
 	|
-	reglist reg
+	listlist list
 	{
-		$$ = mkreglist($1, $2);
+		$$ = mklistlist($1, $2);
+	}
+list:
+   	comment
+	{
+		$$ = mklist($1, NULL);
+	}
+	|
+	reg
+	{
+		$$ = mklist(NULL, $1);
+	}
+comment:
+	COMMENT
+	{
+		$$ = mkcomment(strdup(yytext));
 	}
 reg:
 	prefix paramlist fieldlist
@@ -155,6 +176,11 @@ newline:
 
 %%
 
+YYDEF2(list,
+	struct comment *, comment,
+	struct reg *, reg)
+YYDEF1(comment,
+	const char *, text)
 YYDEF3(reg,
 	const char *, prefix,
 	struct paramlist *, paramlist,
@@ -169,6 +195,12 @@ YYDEF3(field,
 YYDEF2(enumer,
 	int, num,
 	const char *, name)
+
+void
+proccomment(struct comment *comment, void *v)
+{
+	printf(" * %s\n", comment->text);
+}
 
 void
 procreg(struct reg *reg, void *v)
