@@ -13,23 +13,29 @@ enum {
 
 YYDECL2(list,
 	struct comment *, comment,
-	struct reg *, reg);
+	struct reg *, reg,
+);
 YYDECL1(comment,
-	const char *, text);
+	const char *, text,
+);
 YYDECL3(reg,
 	const char *, prefix,
 	struct paramlist *, paramlist,
-	struct fieldlist *, fieldlist);
+	struct fieldlist *, fieldlist,
+);
 YYDECL2(param,
 	int, type,
-	int, size);
+	int, size,
+);
 YYDECL3(field,
 	int, width,
 	const char *, name,
-	struct enumerlist *, enumerlist);
+	struct enumerlist *, enumerlist,
+);
 YYDECL2(enumer,
 	int, num,
-	const char *, name);
+	const char *, name,
+);
 
 void proccommentlist(struct commentlist *, void *);
 void proccomment(struct comment *, void *);

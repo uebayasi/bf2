@@ -13,22 +13,22 @@
  * YYDECL4
  */
 
-#define	YYDECL1(x, ta, a)						\
+#define	YYDECL1(x, ta, a, ext)						\
 	YYDECLLIST(x);							\
-	YYDECLSTR1(x, ta, a);						\
+	YYDECLSTR1(x, ta, a, ext);					\
 	YYDECLMK1(x, ta, a)
-#define	YYDECL2(x, ta, a, tb, b)					\
+#define	YYDECL2(x, ta, a, tb, b, ext)					\
 	YYDECLLIST(x);							\
-	YYDECLSTR2(x, ta, a, tb, b);					\
+	YYDECLSTR2(x, ta, a, tb, b, ext);				\
 	YYDECLMK2(x, ta, a, tb, b)
-#define	YYDECL3(x, ta, a, tb, b, tc, c)					\
+#define	YYDECL3(x, ta, a, tb, b, tc, c, ext)				\
 	YYDECLLIST(x);							\
-	YYDECLSTR3(x, ta, a, tb, b, tc, c);				\
+	YYDECLSTR3(x, ta, a, tb, b, tc, c, ext);			\
 	YYDECLMK3(x, ta, a, tb, b, tc, c)
-#define	YYDECL4(x, ta, a, tb, b, tc, c)					\
+#define	YYDECL4(x, ta, a, tb, b, tc, c, td, d, ext)			\
 	YYDECLLIST(x);							\
-	YYDECLSTR4(x, ta, a, tb, b, tc, c, td, d);			\
-	YYDECLMK3(x, ta, a, tb, b, tc, c)
+	YYDECLSTR4(x, ta, a, tb, b, tc, c, td, d, ext);			\
+	YYDECLMK3(x, ta, a, tb, b, tc, c, td, d)
 
 #define	YYDECLLIST(x)							\
 struct x##list;								\
@@ -42,27 +42,31 @@ void print##x##listcb(struct x *, void *);				\
 void iter##x##list(struct x##list *,					\
     void (*)(struct x *, void *), void *)
 
-#define	YYDECLSTR1(x, ta, a)						\
+#define	YYDECLSTR1(x, ta, a, ext)					\
 struct x {								\
 	ta a;								\
+	ext								\
 }
-#define	YYDECLSTR2(x, ta, a, tb, b)					\
+#define	YYDECLSTR2(x, ta, a, tb, b, ext)				\
 struct x {								\
 	ta a;								\
 	tb b;								\
+	ext								\
 }
-#define	YYDECLSTR3(x, ta, a, tb, b, tc, c)				\
+#define	YYDECLSTR3(x, ta, a, tb, b, tc, c, ext)				\
 struct x {								\
 	ta a;								\
 	tb b;								\
 	tc c;								\
+	ext								\
 }
-#define	YYDECLSTR4(x, ta, a, tb, b, tc, c, td, d)			\
+#define	YYDECLSTR4(x, ta, a, tb, b, tc, c, td, d, ext)			\
 struct x {								\
 	ta a;								\
 	tb b;								\
 	tc c;								\
 	td d;								\
+	ext								\
 }
 
 #define	YYDECLMK1(x, ta, a)						\
