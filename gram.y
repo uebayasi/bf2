@@ -47,18 +47,18 @@ int yywrap(void);
 %}
 
 %union {
-	int num;
-	const char *str;
-	struct enumer *enumer;
-	struct enumerlist *enumerlist;
-	struct field *field;
-	struct fieldlist *fieldlist;
-	struct param *param;
-	struct paramlist *paramlist;
-	struct reg *reg;
-	struct comment *comment;
-	struct list *list;
 	struct listlist *listlist;
+	struct list *list;
+	struct comment *comment;
+	struct reg *reg;
+	struct paramlist *paramlist;
+	struct param *param;
+	struct fieldlist *fieldlist;
+	struct field *field;
+	struct enumerlist *enumerlist;
+	struct enumer *enumer;
+	const char *str;
+	int num;
 }
 
 %token	COMMENT
