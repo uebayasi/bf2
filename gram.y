@@ -232,10 +232,3 @@ yywrap(void)
 {
 	return 1;
 }
-
-int
-main(int ac, char *av[])
-{
-	yyparse();
-	return 0;
-}
