@@ -17,6 +17,8 @@ enum endian {
 	ENDIAN_BIG = 2,
 };
 
+struct mask { int S; int E; };
+
 YYDECL2(list,
 	struct commentlist *, commentlist,
 	struct reg *, reg,
@@ -36,11 +38,13 @@ YYDECL3(param,
 	int, size,
 	enum endian, endian,
 );
-YYDECL4(field,
+#define	field_ext \
+	struct mask mask;
+YYDECL3(field,
 	int, width,
 	const char *, name,
 	struct enumerlist *, enumerlist,
-	int, offset,
+	field_ext
 );
 YYDECL2(enumer,
 	int, num,

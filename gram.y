@@ -160,11 +160,10 @@ YYDEF3(param,
 	int, type,
 	int, size,
 	enum endian, endian)
-YYDEF4(field,
+YYDEF3(field,
 	int, width,
 	const char *, name,
-	struct enumerlist *, enumerlist,
-	int, offset)
+	struct enumerlist *, enumerlist)
 YYDEF2(enumer,
 	int, num,
 	const char *, name)
@@ -178,8 +177,10 @@ makefield(int width, const char *name, struct enumerlist *enumer)
 	if (prev_field == NULL)
 		offset = 0;
 	else
-		offset = prev_field->offset + prev_field->width;
-	field = mkfield(width, name, enumer, offset);
+		offset = prev_field->mask.E + prev_field->width;
+	field = mkfield(width, name, enumer);
+	field->mask.S = offset;
+	field->mask.E = field->mask.S + width;
 	prev_field = field;
 	return field;
 }
