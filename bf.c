@@ -225,9 +225,12 @@ print_accs(const char *prefixstr, struct accs *accs,
 		print_mask(prefixstr, aiv, accs->align);
 
 		struct enumer *enumer;
-		TAILQ_FOREACH(enumer, &enumerlist->head, entry) {
-			print_enumer(prefixstr, aiv, enumer);
+		if (enumerlist != NULL) {
+			TAILQ_FOREACH(enumer, &enumerlist->head, entry) {
+				print_enumer(prefixstr, aiv, enumer);
+			}
 		}
+
 	}
 }
 
