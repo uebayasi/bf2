@@ -10,6 +10,7 @@
 
 void dolist(struct list *);
 
+struct field *makefield(int, const char *, struct enumerlist *);
 void proccommentlist(struct commentlist *, void *);
 void proccomment(struct comment *, void *);
 void procreg(struct reg *, void *);
@@ -118,21 +119,9 @@ fieldlist: /* empty */ {
 		$$ = mkfieldlist($1, $2);
 	}
 field: number id enumerlist newline {
-		int offset;
-		if (prev_field == NULL)
-			offset = 0;
-		else
-			offset = prev_field->offset + prev_field->width;
-		$$ = mkfield($1, $2, $3, offset);
-		prev_field = $$;
+		$$ = makefield($1, $2, $3);
 	} | number newline {
-		int offset;
-		if (prev_field == NULL)
-			offset = 0;
-		else
-			offset = prev_field->offset + prev_field->width;
-		$$ = mkfield($1, NULL, NULL, offset);
-		prev_field = $$;
+		$$ = makefield($1, NULL, NULL);
 	}
 enumerlist: /* empty */ {
 		$$ = NULL;
@@ -179,6 +168,21 @@ YYDEF4(field,
 YYDEF2(enumer,
 	int, num,
 	const char *, name)
+
+struct field *
+makefield(int width, const char *name, struct enumerlist *enumer)
+{
+	struct field *field;
+	int offset;
+
+	if (prev_field == NULL)
+		offset = 0;
+	else
+		offset = prev_field->offset + prev_field->width;
+	field = mkfield(width, name, enumer, offset);
+	prev_field = field;
+	return field;
+}
 
 void
 proccomment(struct comment *comment, void *v)
