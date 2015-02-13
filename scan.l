@@ -14,17 +14,15 @@ space		[ \t]*
 blank		[ \t][ \t]*
 text		[^\n][^\n]*
 newline		[\n]
-ignoreline	^{space}#?.*{newline}
+ignoreline	^{space}#?[^{newline}]*{newline}
 ignore		#.*{newline}
 
 %s		_COMMENT
 
 %%
 
-{kw_comment} {
+{kw_comment}{space} {
 	BEGIN _COMMENT;
-}
-<_COMMENT>{blank} {
 }
 <_COMMENT>{newline} {
 	BEGIN INITIAL;
@@ -32,13 +30,28 @@ ignore		#.*{newline}
 <_COMMENT>{text} {
 	return COMMENT;
 }
-{kw_prefix}	return PREFIX;
-{kw_size}	return SIZE;
-{id}		return ID;
-{number}	return NUMBER;
-
-{ignoreline}	;
-{ignore}	;
+{kw_prefix} {
+	return KW_PREFIX;
+}
+{kw_size} {
+	return KW_SIZE;
+}
+{kw_endian} {
+	return KW_ENDIAN;
+}
+{endian} {
+	return ENDIAN;
+}
+{id} {
+	return ID;
+}
+{number} {
+	return NUMBER;
+}
+{ignoreline}	{
+}
+{ignore}	{
+}
 {newline}	return NEWLINE;
 {blank}		;
 .		;

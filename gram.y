@@ -6,36 +6,9 @@
 
 #include "scan.h"
 
-enum {
-	PARAM_SIZE = 1,
-	PARAM_ENDIAN = 2,
-};
+#include "gram_local.h"
 
-YYDECL2(list,
-	struct comment *, comment,
-	struct reg *, reg,
-);
-YYDECL1(comment,
-	const char *, text,
-);
-YYDECL3(reg,
-	const char *, prefix,
-	struct paramlist *, paramlist,
-	struct fieldlist *, fieldlist,
-);
-YYDECL2(param,
-	int, type,
-	int, size,
-);
-YYDECL3(field,
-	int, width,
-	const char *, name,
-	struct enumerlist *, enumerlist,
-);
-YYDECL2(enumer,
-	int, num,
-	const char *, name,
-);
+void dolist(struct list *);
 
 void proccommentlist(struct commentlist *, void *);
 void proccomment(struct comment *, void *);
@@ -49,10 +22,12 @@ int yywrap(void);
 %union {
 	struct listlist *listlist;
 	struct list *list;
+	struct commentlist *commentlist;
 	struct comment *comment;
 	struct reg *reg;
 	struct paramlist *paramlist;
 	struct param *param;
+	int endian;
 	struct fieldlist *fieldlist;
 	struct field *field;
 	struct enumerlist *enumerlist;
@@ -62,18 +37,22 @@ int yywrap(void);
 }
 
 %token	COMMENT
-%token	PREFIX
-%token	SIZE
+%token	KW_PREFIX
+%token	KW_SIZE
+%token	KW_ENDIAN
+%token	ENDIAN
 %token	ID
 %token	NUMBER
 %token	NEWLINE
 
 %type	<listlist>	listlist
 %type	<list>		list
+%type	<commentlist>	commentlist
 %type	<comment>	comment
 %type	<reg>		reg
 %type	<paramlist>	paramlist
 %type	<param>		param
+%type	<endian>	endian
 %type	<fieldlist>	fieldlist
 %type	<field>		field
 %type	<enumerlist>	enumerlist
@@ -92,9 +71,10 @@ listlist:
 	listlist list
 	{
 		$$ = mklistlist($1, $2);
+		alllistlist = $$;
 	}
 list:
-   	comment
+	commentlist
 	{
 		$$ = mklist($1, NULL);
 	}
@@ -102,6 +82,15 @@ list:
 	reg
 	{
 		$$ = mklist(NULL, $1);
+	}
+commentlist:
+	{
+		$$ = NULL;
+	}
+	|
+	commentlist comment
+	{
+		$$ = mkcommentlist($1, $2);
 	}
 comment:
 	COMMENT
@@ -130,7 +119,12 @@ paramlist:
 param:
 	kw_size number newline
 	{
-		$$ = mkparam(PARAM_SIZE, $2);
+		$$ = mkparam(PARAM_SIZE, $2, 0);
+	}
+	|
+	kw_endian endian newline
+	{
+		$$ = mkparam(PARAM_ENDIAN, 0, $2);
 	}
 fieldlist:
 	{
@@ -161,10 +155,21 @@ enumer:
 		$$ = mkenumer($1, $2);
 	}
 kw_prefix:
-	PREFIX
+	KW_PREFIX
 	;
 kw_size:
-	SIZE
+	KW_SIZE
+	;
+endian:
+	ENDIAN
+	{
+		if (yytext[0] == 'L' || yytext[0] == 'l')
+			$$ = ENDIAN_LITTLE;
+		else
+			$$ = ENDIAN_BIG;
+	}
+kw_endian:
+	KW_ENDIAN
 	;
 id:
 	ID
@@ -177,13 +182,15 @@ number:
 		$$ = atoi(yytext);
 	}
 newline:
-       NEWLINE
-       ;
+	NEWLINE
+	;
 
 %%
 
+struct listlist *alllistlist;
+
 YYDEF2(list,
-	struct comment *, comment,
+	struct commentlist *, commentlist,
 	struct reg *, reg)
 YYDEF1(comment,
 	const char *, text)
@@ -191,9 +198,10 @@ YYDEF3(reg,
 	const char *, prefix,
 	struct paramlist *, paramlist,
 	struct fieldlist *, fieldlist)
-YYDEF2(param,
+YYDEF3(param,
 	int, type,
-	int, size)
+	int, size,
+	enum endian, endian)
 YYDEF3(field,
 	int, width,
 	const char *, name,

@@ -6,6 +6,8 @@
 
 /******************************************************************************/
 
+#include "queue.h"
+
 /*
  * YYDECL1
  * YYDECL2
@@ -33,7 +35,7 @@
 #define	YYDECLLIST(x)							\
 struct x##list;								\
 struct x##list {							\
-	struct x##list *next;						\
+	TAILQ_HEAD(x##list##head, x) head;				\
 	struct x *x;							\
 };									\
 struct x##list *mk##x##list(struct x##list *, struct x *);		\
@@ -43,25 +45,33 @@ void iter##x##list(struct x##list *,					\
     void (*)(struct x *, void *), void *)
 
 #define	YYDECLSTR1(x, ta, a, ext)					\
+struct x;								\
 struct x {								\
+	TAILQ_ENTRY(x) entry;						\
 	ta a;								\
 	ext								\
 }
 #define	YYDECLSTR2(x, ta, a, tb, b, ext)				\
+struct x;								\
 struct x {								\
+	TAILQ_ENTRY(x) entry;						\
 	ta a;								\
 	tb b;								\
 	ext								\
 }
 #define	YYDECLSTR3(x, ta, a, tb, b, tc, c, ext)				\
+struct x;								\
 struct x {								\
+	TAILQ_ENTRY(x) entry;						\
 	ta a;								\
 	tb b;								\
 	tc c;								\
 	ext								\
 }
 #define	YYDECLSTR4(x, ta, a, tb, b, tc, c, td, d, ext)			\
+struct x;								\
 struct x {								\
+	TAILQ_ENTRY(x) entry;						\
 	ta a;								\
 	tb b;								\
 	tc c;								\
@@ -88,23 +98,43 @@ struct x *mk##x(ta, tb, tc, td)
  */
 
 #define	YYDEF1(x, ta, a)						\
-	YYDEFLIST(x, ta, a)						\
+	YYDEFLIST(x, a)							\
 	YYDEFMK1(x, ta, a)
 #define	YYDEF2(x, ta, a, tb, b)						\
-	YYDEFLIST(x, ta, a)						\
+	YYDEFLIST(x, a)							\
 	YYDEFMK2(x, ta, a, tb, b)
 #define	YYDEF3(x, ta, a, tb, b, tc, c)					\
-	YYDEFLIST(x, ta, a)						\
+	YYDEFLIST(x, a)							\
 	YYDEFMK3(x, ta, a, tb, b, tc, c)
 #define	YYDEF4(x, ta, a, tb, b, tc, c, td, d)				\
-	YYDEFLIST(x, ta, a)						\
+	YYDEFLIST(x, a)							\
 	YYDEFMK4(x, ta, a, tb, b, tc, c, td, d)
 
-#define	YYDEFLIST(x, ta, a)						\
-	YYDEFMK2(x##list, struct x##list *, next, struct x *, x)	\
+#define	YYDEFLIST(x, a)							\
+	YYDEFMKLIST(x, a)						\
 	YYDEFPRINT(x)							\
 	YYDEFITER(x)
 
+#define TAILQ_MOVE(head, oldhead, field) do {				\
+	(head)->tqh_first = (oldhead)->tqh_first;			\
+	(head)->tqh_last = (oldhead)->tqh_last;				\
+	(head)->tqh_first->field.tqe_prev = &(head)->tqh_first;		\
+	*(head)->tqh_last = TAILQ_END(head);				\
+} while (/*CONSTCOND*/0)
+
+#define	YYDEFMKLIST(x, a)						\
+struct x##list *							\
+mk##x##list(struct x##list *ol, struct x *e)				\
+{									\
+	struct x##list *nl = calloc(sizeof *nl, 1);			\
+	nl->x = e;							\
+	if (ol == NULL)							\
+		TAILQ_INIT(&nl->head);					\
+	else								\
+		TAILQ_MOVE(&nl->head, &ol->head, entry);		\
+	TAILQ_INSERT_TAIL(&nl->head, e, entry);				\
+	return nl;							\
+}
 #define	YYDEFMK1(x, ta, a)						\
 struct x *								\
 mk##x(ta a)								\
@@ -163,10 +193,6 @@ void									\
 iter##x##list(struct x##list *x##list,					\
     void (*proc)(struct x *, void *), void *v)				\
 {									\
-	struct x##list *next = x##list->next;				\
-	if (next != NULL) {						\
-		iter##x##list(next, proc, v);				\
-	}								\
 	(*proc)(x##list->x, v);						\
 }
 
