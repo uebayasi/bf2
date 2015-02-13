@@ -1,3 +1,5 @@
+////////////////////////////////////////////////////////////////////////////////
+
 #include "yacc.h"
 
 #include "scan.h"
@@ -51,7 +53,24 @@ YYDECL2(enumer,
 	const char *, name,
 );
 
+////////////////////////////////////////////////////////////////////////////////
+
+struct global {
+	int asiz;
+	int verbose;
+	int full;
+	struct reg *cur_reg, *prev_reg;
+	struct field *cur_field, *prev_field;
+	struct enumer *cur_enumer, *prev_enumer;
+	enum endian target;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
 extern struct listlist *alllistlist;
 extern struct listlistlist all;
+extern struct global *global;
+
+////////////////////////////////////////////////////////////////////////////////
 
 void field_print(const struct field *);

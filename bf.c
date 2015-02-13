@@ -66,8 +66,8 @@ static void analyze_accs(const struct mask *, struct accs *);
 static int calc_access_align(const struct mask *);
 static int calc_access_size(const int, const struct mask *);
 static int calc_access_shift(const int, const int, const struct mask *);
+static void print_accs(const char *, struct accs *, const struct enumerlist *);
 #if 0
-static void print_accs(const char *, struct accs *, const struct enumers *);
 static void print_mask(const char *, const struct aiv *, const int);
 static void print_enumer(const char *, const struct aiv *,
     const struct enumer *);
@@ -77,15 +77,7 @@ static void mask2vec(const struct aiv *, struct aiv *);
 static void num2vec(const struct aiv *, struct aiv *);
 #endif
 
-struct global {
-	int asiz;
-	int verbose;
-	int full;
-	struct reg *cur_prefix, *prev_prefix;
-	struct field *cur_field, *prev_field;
-	struct enumer *cur_enumer, *prev_enumer;
-	enum endian target;
-} global_storage, *global = &global_storage;
+struct global global_storage, *global = &global_storage;
 
 void
 field_print(const struct field *field)
@@ -93,20 +85,21 @@ field_print(const struct field *field)
 	struct accs accs_storage, *accs = &accs_storage;
 	analyze_accs(&field->mask, accs);
 
-#if 0
 	const char *fmt = "/* field: name=%s offset=%d width=%d */\n";
 	static int once = 0;
 	if (field->name == NULL) {
+#if 0
 		/* Unused bits (pads). */
 		if (global->verbose) {
 			if (once++ != 0)
 				putchar('\n');
 			//printf(fmt, "(unused)", field->offset, field->width);
 		}
+#endif
 	} else {
+#if 0
 		if (once++ != 0)
 			putchar('\n');
-#if 0
 		if (global->verbose) {
 			//printf(fmt, field->name, field->offset, field->width);
 		}
@@ -114,11 +107,10 @@ field_print(const struct field *field)
 		const char * const name = field->name;
 		char prefixstr[256];
 		snprintf(prefixstr, sizeof(prefixstr), "%s%s%s",
-		    global->cur_prefix->name ? global->cur_prefix->name : "",
-		    global->cur_prefix->name ? "_" : "", name);
-		print_accs(prefixstr, accs, &field->enumers);
+		    global->cur_reg->prefix ? global->cur_reg->prefix : "",
+		    global->cur_reg->prefix ? "_" : "", name);
+		print_accs(prefixstr, accs, field->enumerlist);
 	}
-#endif
 }
 
 static void
@@ -219,10 +211,9 @@ calc_access_shift(const int align, const int asiz, const struct mask *mask)
 		(mask->S % asiz);
 }
 
-#if 0
 static void
 print_accs(const char *prefixstr, struct accs *accs,
-    const struct enumers *enumers)
+    const struct enumerlist *enumerlist)
 {
 	/* Provide all access widths >minasiz. */
 	int asiz;
@@ -231,14 +222,17 @@ print_accs(const char *prefixstr, struct accs *accs,
 		if (global->asiz != 0 && (global->asiz & asiz) == 0)
 			continue;
 		struct aiv *aiv = &accs->aivs[asiz2idx(asiz)];
+#if 0
 		print_mask(prefixstr, aiv, accs->align);
 		struct enumer *enumer;
 		SIMPLEQ_FOREACH(enumer, enumers, entry) {
 			print_enumer(prefixstr, aiv, enumer);
 		}
+#endif
 	}
 }
 
+#if 0
 /* Print accessors. */
 static void
 print_mask(const char *prefixstr, const struct aiv *aiv, const int align)
@@ -431,13 +425,13 @@ static void
 dump(struct reg *prefix)
 {
 	struct layout *layout = dump_layout_alloc();
-	const char *name = global->cur_prefix->name;
+	const char *name = global->cur_reg->prefix;
 
 	putchar('\n');
 	printf("/*\n");
 	printf(" * %s%s(prefix=%s size=%d target=%d)\n",
 	    name ? name : "", name ? " " : "",
-	    name, global->cur_prefix->size, global->target);
+	    name, global->cur_reg->size, global->target);
 	printf(" *\n");
 	printf(" * real memory layout:\n");
 	dump_fields_addresses(layout, 0);
@@ -465,14 +459,14 @@ dump_layout_alloc(void)
 	struct layout *layout;
 
 	layout = calloc(sizeof(*layout), 1);
-	layout->size = (global->cur_prefix->size + MAXASIZ) & ~(MAXASIZ - 1);
+	layout->size = (global->cur_reg->size + MAXASIZ) & ~(MAXASIZ - 1);
 	layout->buf = malloc(layout->size);
 	memset(layout->buf, '.', layout->size);
 
 	struct field *field;
 	char C = 'a';
 	int i = 0;
-	SIMPLEQ_FOREACH(field, &global->cur_prefix->fields, entry) {
+	SIMPLEQ_FOREACH(field, &global->cur_reg->fields, entry) {
 		int j;
 		for (j = 0; j < field->width; j++) {
 			const int x = global->target == ENDIAN_BIG ?
@@ -514,7 +508,7 @@ dump_fields_addresses(struct layout *layout, int swap)
 	int i;
 
 	printf(" * ");
-	for (i = 0; i < global->cur_prefix->size; i += NBBY) {
+	for (i = 0; i < global->cur_reg->size; i += NBBY) {
 		if (i > 0 && i % NBBY == 0)
 			putchar(' ');
 		if (swap == 0) {
@@ -535,7 +529,7 @@ dump_fields_bits(struct layout *layout, int swap)
 	int i;
 
 	printf(" * ");
-	for (i = 0; i < global->cur_prefix->size; i += NBBY) {
+	for (i = 0; i < global->cur_reg->size; i += NBBY) {
 		int index, incr;
 		index = bits_index(i, swap, &incr);
 		const char *p = layout->buf + index;
@@ -556,7 +550,7 @@ dump_fields_legend(void)
 	char C = 'a';
 
 	printf(" * ");
-	SIMPLEQ_FOREACH(field, &global->cur_prefix->fields, entry) {
+	SIMPLEQ_FOREACH(field, &global->cur_reg->fields, entry) {
 		const char * const name =
 		    (field->name != NULL) ? field->name : "(unused)";
 		printf("%s%c:%d:%s",

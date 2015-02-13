@@ -183,8 +183,6 @@ makefield(int width, const char *name, struct enumerlist *enumer)
 	field->mask.E = field->mask.S + width;
 	prev_field = field;
 
-	field_print(field);
-
 	return field;
 }
 
