@@ -14,10 +14,10 @@ install:
 clean:
 	rm -f bf bf.yy.c
 
-bf: main.c gram.y scan.l yacc.h bf.c
+bf: main.c gram.y scan.l yacc.h bf.c strtonum.c
 	yacc -d -o gram.c gram.y
 	flex -o scan.c --header=scan.h scan.l
-	cc -g -O0 main.c gram.c scan.c bf.c -o bf
+	cc -g -O0 main.c gram.c scan.c bf.c strtonum.c -o bf
 
 .PHONY: test
 test:

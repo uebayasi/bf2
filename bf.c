@@ -2,16 +2,6 @@
 
 #include "gram_local.h"
 
-#define MINASIZ (1 * NBBY)
-#define MAXASIZ (8 * NBBY)
-
-#ifndef NBBY
-#define NBBY		8
-#endif
-#ifndef NBBYSTR
-#define NBBYSTR		"8"
-#endif
-
 #ifndef MAX
 #define MAX(a, b)	(((a) > (b)) ? (a) : (b))
 #endif

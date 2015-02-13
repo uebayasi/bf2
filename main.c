@@ -1,18 +1,50 @@
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "gram_local.h"
 
 int yyparse(void);
 void field_print(const struct field *);
 
-int
-main(int ac, char *av[])
-{
-	yyparse();
+long long strtonum(const char *, long long, long long, const char **);
 
-	global->full = 0;	// XXX
-	global->asiz = 64;	// XXX
+int
+main(int argc, char *argv[])
+{
+	int c;
+	extern char *optarg;
+
+	while ((c = getopt(argc, argv, "a:fv")) != -1) {
+		int asiz;
+		switch (c) {
+		case 'a':
+			asiz = strtonum(optarg, MINASIZ, MAXASIZ, NULL);
+			switch (asiz) {
+			case MINASIZ:
+			case 2*MINASIZ:
+			case 4*MINASIZ:
+			case MAXASIZ:
+				global->asiz |= asiz;
+				break;
+			default:
+				fprintf(stderr, "invalid access size (%d)\n",
+				    asiz);
+				exit(1);
+				/* NOTREACHED */
+			}
+			break;
+		case 'f':
+			global->full = 1;
+			break;
+		case 'v':
+			global->verbose = 1;
+			break;
+		}
+	}
+
+	yyparse();
 
 	struct list *l;
 	TAILQ_FOREACH(l, &alllistlist->head, entry) {

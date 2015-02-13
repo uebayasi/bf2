@@ -4,6 +4,16 @@
 
 #include "scan.h"
 
+#define MINASIZ (1 * NBBY)
+#define MAXASIZ (8 * NBBY)
+
+#ifndef NBBY
+#define NBBY		8
+#endif
+#ifndef NBBYSTR
+#define NBBYSTR		"8"
+#endif
+
 enum param_type {
 	PARAM_SIZE = 1,
 	PARAM_ENDIAN = 2,
