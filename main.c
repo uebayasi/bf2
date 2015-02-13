@@ -54,6 +54,7 @@ main(int argc, char *argv[])
 
 	struct list *l;
 	TAILQ_FOREACH(l, &alllistlist->head, entry) {
+		// Register
 		if (l->reg != NULL) {
 			global->cur_reg = l->reg;
 
@@ -64,11 +65,16 @@ main(int argc, char *argv[])
 				}
 			}
 		}
+		// Comment
 		if (l->commentlist != NULL) {
 			struct comment *c;
 			TAILQ_FOREACH(c, &l->commentlist->head, entry) {
 				printf("// %s\n", c->text);
 			}
+		}
+		// Separator
+		if (l->reg == NULL && l->commentlist == NULL) {
+			putchar('\n');
 		}
 	}
 	return 0;
