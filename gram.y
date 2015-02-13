@@ -76,20 +76,28 @@ listlist	: /* empty */ {
 			$$ = mklistlist($1, $2);
 			alllistlist = $$;
 		}
+
 list		: commentlist { $$ = mklist($1, NULL); }
 		| sep { $$ = mklist(NULL, NULL); }
 		| reg { $$ = mklist(NULL, $1); }
+
 sep		: SEP { $$ = mksep(); }
+
 commentlist	: /* empty */ { $$ = NULL; }
 		| commentlist comment { $$ = mkcommentlist($1, $2); }
+
 comment		: COMMENT { $$ = mkcomment(strdup(yytext)); }
+
 reg		: prefix paramlist fieldlist {
 			prev_field = NULL;
 			$$ = makereg($1, $2, $3);
 		}
+
 prefix		: kw_prefix id newline { $$ = strdup($2); }
+
 paramlist	: /* empty */ { $$ = NULL; }
 		| paramlist param { $$ = mkparamlist($1, $2); }
+
 param		: kw_size number newline { $$ = mkparam(PARAM_SIZE, $2, 0); }
 		| kw_endian id newline {
 			enum endian endian;
@@ -99,19 +107,29 @@ param		: kw_size number newline { $$ = mkparam(PARAM_SIZE, $2, 0); }
 				endian = ENDIAN_BIG;
 			$$ = mkparam(PARAM_ENDIAN, 0, endian);
 		}
+
 fieldlist	: /* empty */ { $$ = NULL; }
 		| fieldlist field { $$ = mkfieldlist($1, $2); }
+
 field		: number id enumerlist newline { $$ = makefield($1, $2, $3); }
 		| number newline { $$ = makefield($1, NULL, NULL); }
+
 enumerlist	: /* empty */ { $$ = NULL; }
 		| enumerlist enumer { $$ = mkenumerlist($1, $2); }
+
 enumer		: number id { $$ = mkenumer($1, $2); }
+
 kw_prefix	: KW_PREFIX ;
+
 kw_size		: KW_SIZE ;
+
 kw_endian	: KW_ENDIAN ;
+
 id		: ID { $$ = strdup(yytext); }
+
 number		: NUMBER { $$ = atoi(yytext); }
-newline: NEWLINE ;
+
+newline		: NEWLINE ;
 
 %%
 
