@@ -58,8 +58,8 @@ main(int argc, char *argv[])
 		if (l->reg != NULL) {
 			global->cur_reg = l->reg;
 
-			struct field *f;
 			if (l->reg->fieldlist != NULL) {
+				struct field *f;
 				TAILQ_FOREACH(f, &l->reg->fieldlist->head, entry) {
 					field_print(f);
 				}
@@ -67,10 +67,12 @@ main(int argc, char *argv[])
 		}
 		// Comment
 		if (l->commentlist != NULL) {
+			printf("/*\n");
 			struct comment *c;
 			TAILQ_FOREACH(c, &l->commentlist->head, entry) {
-				printf("// %s\n", c->text);
+				printf(" * %s\n", c->text);
 			}
+			printf(" */\n");
 		}
 		// Separator
 		if (l->reg == NULL && l->commentlist == NULL) {
