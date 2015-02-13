@@ -14,6 +14,8 @@
  * YYDECL2
  * YYDECL3
  * YYDECL4
+ * YYDECL5
+ * YYDECL6
  */
 
 #define	YYDECL0(x, ext)							\
@@ -35,7 +37,15 @@
 #define	YYDECL4(x, ta, a, tb, b, tc, c, td, d, ext)			\
 	YYDECLLIST(x);							\
 	YYDECLSTR4(x, ta, a, tb, b, tc, c, td, d, ext);			\
-	YYDECLMK3(x, ta, a, tb, b, tc, c, td, d)
+	YYDECLMK4(x, ta, a, tb, b, tc, c, td, d)
+#define	YYDECL5(x, ta, a, tb, b, tc, c, td, d, te, e, ext)		\
+	YYDECLLIST(x);							\
+	YYDECLSTR5(x, ta, a, tb, b, tc, c, td, d, te, e, ext);		\
+	YYDECLMK5(x, ta, a, tb, b, tc, c, td, d, te, e)
+#define	YYDECL6(x, ta, a, tb, b, tc, c, td, d, te, e, tf, f, ext)	\
+	YYDECLLIST(x);							\
+	YYDECLSTR6(x, ta, a, tb, b, tc, c, td, d, te, e, tf, f, ext);	\
+	YYDECLMK6(x, ta, a, tb, b, tc, c, td, d, te, e, tf, f)
 
 #define	YYDECLLIST(x)							\
 struct x##list;								\
@@ -89,6 +99,29 @@ struct x {								\
 	td d;								\
 	ext								\
 }
+#define	YYDECLSTR5(x, ta, a, tb, b, tc, c, td, d, te, e, ext)		\
+struct x;								\
+struct x {								\
+	TAILQ_ENTRY(x) entry;						\
+	ta a;								\
+	tb b;								\
+	tc c;								\
+	td d;								\
+	te e;								\
+	ext								\
+}
+#define	YYDECLSTR6(x, ta, a, tb, b, tc, c, td, d, te, e, tf, f, ext)	\
+struct x;								\
+struct x {								\
+	TAILQ_ENTRY(x) entry;						\
+	ta a;								\
+	tb b;								\
+	tc c;								\
+	td d;								\
+	te e;								\
+	tf f;								\
+	ext								\
+}
 
 #define	YYDECLMK0(x)							\
 struct x *mk##x(void)
@@ -100,6 +133,10 @@ struct x *mk##x(ta, tb)
 struct x *mk##x(ta, tb, tc)
 #define	YYDECLMK4(x, ta, a, tb, b, tc, c, td, d)			\
 struct x *mk##x(ta, tb, tc, td)
+#define	YYDECLMK5(x, ta, a, tb, b, tc, c, td, d, te, e)			\
+struct x *mk##x(ta, tb, tc, td)
+#define	YYDECLMK6(x, ta, a, tb, b, tc, c, td, d, te, e, tf, f)		\
+struct x *mk##x(ta, tb, tc, td)
 
 /******************************************************************************/
 
@@ -109,6 +146,8 @@ struct x *mk##x(ta, tb, tc, td)
  * YYDEF2
  * YYDEF3
  * YYDEF4
+ * YYDEF5
+ * YYDEF6
  */
 
 #define	YYDEF0(x)							\
@@ -126,6 +165,12 @@ struct x *mk##x(ta, tb, tc, td)
 #define	YYDEF4(x, ta, a, tb, b, tc, c, td, d)				\
 	YYDEFLIST(x)							\
 	YYDEFMK4(x, ta, a, tb, b, tc, c, td, d)
+#define	YYDEF5(x, ta, a, tb, b, tc, c, td, d)				\
+	YYDEFLIST(x)							\
+	YYDEFMK5(x, ta, a, tb, b, tc, c, td, d, te, e)
+#define	YYDEF6(x, ta, a, tb, b, tc, c, td, d)				\
+	YYDEFLIST(x)							\
+	YYDEFMK6(x, ta, a, tb, b, tc, c, td, d, te, e, tf, f)
 
 #define	YYDEFLIST(x)							\
 	YYDEFMKLIST(x)							\
@@ -195,6 +240,31 @@ mk##x(ta a, tb b, tc c, td d)						\
 	x->b = b;							\
 	x->c = c;							\
 	x->d = d;							\
+	return x;							\
+}
+#define	YYDEFMK5(x, ta, a, tb, b, tc, c, td, d, te, e)			\
+struct x *								\
+mk##x(ta a, tb b, tc c, td d, te e)					\
+{									\
+	struct x *x = calloc(sizeof *x, 1);				\
+	x->a = a;							\
+	x->b = b;							\
+	x->c = c;							\
+	x->d = d;							\
+	x->e = e;							\
+	return x;							\
+}
+#define	YYDEFMK6(x, ta, a, tb, b, tc, c, td, d, te, e, tf, f)		\
+struct x *								\
+mk##x(ta a, tb b, tc c, td d, te e, tf f)				\
+{									\
+	struct x *x = calloc(sizeof *x, 1);				\
+	x->a = a;							\
+	x->b = b;							\
+	x->c = c;							\
+	x->d = d;							\
+	x->e = e;							\
+	x->f = f;							\
 	return x;							\
 }
 
