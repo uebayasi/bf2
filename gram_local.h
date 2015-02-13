@@ -53,3 +53,5 @@ YYDECL2(enumer,
 
 extern struct listlist *alllistlist;
 extern struct listlistlist all;
+
+void field_print(const struct field *);
