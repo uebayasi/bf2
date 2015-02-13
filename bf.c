@@ -78,22 +78,20 @@ field_print(const struct field *field)
 	const char *fmt = "/* field: name=%s offset=%d width=%d */\n";
 	static int once = 0;
 	if (field->name == NULL) {
-#if 0
 		/* Unused bits (pads). */
 		if (global->verbose) {
 			if (once++ != 0)
 				putchar('\n');
-			//printf(fmt, "(unused)", field->offset, field->width);
+			printf(fmt, "(unused)", field->mask.S, field->width);
 		}
-#endif
 	} else {
 #if 0
 		if (once++ != 0)
 			putchar('\n');
-		if (global->verbose) {
-			//printf(fmt, field->name, field->offset, field->width);
-		}
 #endif
+		if (global->verbose) {
+			printf(fmt, field->name, field->mask.S, field->width);
+		}
 		const char * const name = field->name;
 		char prefixstr[256];
 		snprintf(prefixstr, sizeof(prefixstr), "%s%s%s",
