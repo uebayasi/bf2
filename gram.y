@@ -28,7 +28,6 @@ int yywrap(void);
 	struct reg *reg;
 	struct paramlist *paramlist;
 	struct param *param;
-	int endian;
 	struct fieldlist *fieldlist;
 	struct field *field;
 	struct enumerlist *enumerlist;
@@ -55,7 +54,6 @@ int yywrap(void);
 %type	<reg>		reg
 %type	<paramlist>	paramlist
 %type	<param>		param
-%type	<endian>	endian
 %type	<fieldlist>	fieldlist
 %type	<field>		field
 %type	<enumerlist>	enumerlist
@@ -103,8 +101,13 @@ paramlist: /* empty */ {
 	}
 param: kw_size number newline {
 		$$ = mkparam(PARAM_SIZE, $2, 0);
-	} | kw_endian endian newline {
-		$$ = mkparam(PARAM_ENDIAN, 0, $2);
+	} | kw_endian id newline {
+		enum endian endian;
+		if ($2[0] == 'L' || $2[0] == 'l')
+			endian = ENDIAN_LITTLE;
+		else
+			endian = ENDIAN_BIG;
+		$$ = mkparam(PARAM_ENDIAN, 0, endian);
 	}
 fieldlist: /* empty */ {
 		$$ = NULL;
@@ -113,6 +116,8 @@ fieldlist: /* empty */ {
 	}
 field: number id enumerlist newline {
 		$$ = mkfield($1, $2, $3);
+	} | number newline {
+		$$ = mkfield($1, NULL, NULL);
 	}
 enumerlist: /* empty */ {
 		$$ = NULL;
@@ -124,12 +129,6 @@ enumer: number id {
 	}
 kw_prefix: KW_PREFIX ;
 kw_size: KW_SIZE ;
-endian: ENDIAN {
-		if (yytext[0] == 'L' || yytext[0] == 'l')
-			$$ = ENDIAN_LITTLE;
-		else
-			$$ = ENDIAN_BIG;
-	}
 kw_endian: KW_ENDIAN ;
 id: ID {
 		$$ = strdup(yytext);

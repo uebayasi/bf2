@@ -8,13 +8,12 @@ kw_size		(SIZE|size)
 kw_comment	(COMMENT|comment)
 id		[A-Za-z][A-Za-z0-9_]*
 number		[0-9][0-9]*
-endian		[BbLl][A-Za-z]*
 char		.
 space		[ \t]*
 blank		[ \t][ \t]*
 text		[^\n][^\n]*
 newline		[\n]
-ignoreline	^{space}#?[^{newline}]*{newline}
+ignoreline	^{blank}#?[^{newline}]*{newline}
 ignore		#.*{newline}
 
 %s		_COMMENT
@@ -39,9 +38,6 @@ ignore		#.*{newline}
 {kw_endian} {
 	return KW_ENDIAN;
 }
-{endian} {
-	return ENDIAN;
-}
 {id} {
 	return ID;
 }
@@ -54,8 +50,11 @@ ignore		#.*{newline}
 {ignore}	{
 	return SEP;
 }
-{newline}	return NEWLINE;
+{newline}	{
+	return NEWLINE;
+}
 {blank}		;
-.		;
+.		{
+}
 
 %%
