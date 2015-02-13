@@ -21,6 +21,8 @@ YYDECL2(list,
 	struct commentlist *, commentlist,
 	struct reg *, reg,
 );
+YYDECL0(sep,
+);
 YYDECL1(comment,
 	const char *, text,
 );

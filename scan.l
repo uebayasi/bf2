@@ -49,8 +49,10 @@ ignore		#.*{newline}
 	return NUMBER;
 }
 {ignoreline}	{
+	return SEP;
 }
 {ignore}	{
+	return SEP;
 }
 {newline}	return NEWLINE;
 {blank}		;

@@ -24,6 +24,7 @@ int yywrap(void);
 	struct list *list;
 	struct commentlist *commentlist;
 	struct comment *comment;
+	struct sep *sep;
 	struct reg *reg;
 	struct paramlist *paramlist;
 	struct param *param;
@@ -43,12 +44,14 @@ int yywrap(void);
 %token	ENDIAN
 %token	ID
 %token	NUMBER
+%token	SEP
 %token	NEWLINE
 
 %type	<listlist>	listlist
 %type	<list>		list
 %type	<commentlist>	commentlist
 %type	<comment>	comment
+%type	<sep>		sep
 %type	<reg>		reg
 %type	<paramlist>	paramlist
 %type	<param>		param
@@ -79,9 +82,19 @@ list:
 		$$ = mklist($1, NULL);
 	}
 	|
+	sep
+	{
+		$$ = mklist(NULL, NULL);
+	}
+	|
 	reg
 	{
 		$$ = mklist(NULL, $1);
+	}
+sep:
+	SEP
+	{
+		$$ = mksep();
 	}
 commentlist:
 	{
@@ -194,6 +207,7 @@ YYDEF2(list,
 	struct reg *, reg)
 YYDEF1(comment,
 	const char *, text)
+YYDEF0(sep)
 YYDEF3(reg,
 	const char *, prefix,
 	struct paramlist *, paramlist,
