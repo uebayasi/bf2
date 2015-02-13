@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "gram_local.h"
 
 #define MINASIZ (1 * NBBY)
@@ -67,15 +69,15 @@ static int calc_access_align(const struct mask *);
 static int calc_access_size(const int, const struct mask *);
 static int calc_access_shift(const int, const int, const struct mask *);
 static void print_accs(const char *, struct accs *, const struct enumerlist *);
-#if 0
 static void print_mask(const char *, const struct aiv *, const int);
+#if 0
 static void print_enumer(const char *, const struct aiv *,
     const struct enumer *);
+#endif
 static void print_vec(char *, const size_t, const struct aiv *,
     void (*)(const struct aiv *, struct aiv *));
 static void mask2vec(const struct aiv *, struct aiv *);
 static void num2vec(const struct aiv *, struct aiv *);
-#endif
 
 struct global global_storage, *global = &global_storage;
 
@@ -222,8 +224,8 @@ print_accs(const char *prefixstr, struct accs *accs,
 		if (global->asiz != 0 && (global->asiz & asiz) == 0)
 			continue;
 		struct aiv *aiv = &accs->aivs[asiz2idx(asiz)];
-#if 0
 		print_mask(prefixstr, aiv, accs->align);
+#if 0
 		struct enumer *enumer;
 		SIMPLEQ_FOREACH(enumer, enumers, entry) {
 			print_enumer(prefixstr, aiv, enumer);
@@ -232,7 +234,6 @@ print_accs(const char *prefixstr, struct accs *accs,
 	}
 }
 
-#if 0
 /* Print accessors. */
 static void
 print_mask(const char *prefixstr, const struct aiv *aiv, const int align)
@@ -252,7 +253,7 @@ print_mask(const char *prefixstr, const struct aiv *aiv, const int align)
 
 	char swapstr[16];
 	snprintf(swapstr, sizeof(swapstr), "_BfSwap%s%d",
-	    (global->target == LITTLE) ? "Le" : "Be", A >> 3);
+	    (global->target == ENDIAN_LITTLE) ? "Le" : "Be", A >> 3);
 	printf("#define %s_SWAP_%d %s\n", P, A, swapstr);
 
 	if (global->full) {
@@ -329,6 +330,7 @@ print_mask(const char *prefixstr, const struct aiv *aiv, const int align)
 	}
 }
 
+#if 0
 /* Print enum constants. */
 static void
 print_enumer(const char *prefixstr, const struct aiv *aiv,
@@ -346,6 +348,7 @@ print_enumer(const char *prefixstr, const struct aiv *aiv,
 #undef	A
 #undef	P
 }
+#endif
 
 static void
 print_vec(char *str, const size_t len, const struct aiv *aiv,
@@ -389,6 +392,7 @@ mask2vec(const struct aiv *aiv, struct aiv *vec)
 	}
 }
 
+#if 0
 static void
 num2vec(const struct aiv *aiv, struct aiv *vec)
 {
