@@ -10,6 +10,8 @@
 
 void dolist(struct list *);
 
+struct reg *makereg(const char *, struct paramlist *,
+    struct fieldlist *);
 struct field *makefield(int, const char *, struct enumerlist *);
 void proccommentlist(struct commentlist *, void *);
 void proccomment(struct comment *, void *);
@@ -93,7 +95,7 @@ comment: COMMENT {
 	}
 reg: prefix paramlist fieldlist {
 		prev_field = NULL;
-		$$ = mkreg($1, $2, $3);
+		$$ = makereg($1, $2, $3);
 	}
 prefix: kw_prefix id newline {
 		$$ = strdup($2);
@@ -167,6 +169,27 @@ YYDEF3(field,
 YYDEF2(enumer,
 	int, num,
 	const char *, name)
+
+struct reg *
+makereg(const char *prefix, struct paramlist *paramlist,
+    struct fieldlist *fieldlist)
+{
+	struct reg *reg;
+	struct param *param;
+
+	reg = mkreg(prefix, paramlist, fieldlist);
+	TAILQ_FOREACH(param, &reg->paramlist->head, entry) {
+		switch (param->type) {
+		case PARAM_SIZE:
+			reg->size = param->size;
+			break;
+		case PARAM_ENDIAN:
+			reg->endian = param->endian;
+			break;
+		}
+	}
+	return reg;
+}
 
 struct field *
 makefield(int width, const char *name, struct enumerlist *enumer)

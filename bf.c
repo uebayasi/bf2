@@ -70,10 +70,8 @@ static int calc_access_size(const int, const struct mask *);
 static int calc_access_shift(const int, const int, const struct mask *);
 static void print_accs(const char *, struct accs *, const struct enumerlist *);
 static void print_mask(const char *, const struct aiv *, const int);
-#if 0
 static void print_enumer(const char *, const struct aiv *,
     const struct enumer *);
-#endif
 static void print_vec(char *, const size_t, const struct aiv *,
     void (*)(const struct aiv *, struct aiv *));
 static void mask2vec(const struct aiv *, struct aiv *);
@@ -225,12 +223,11 @@ print_accs(const char *prefixstr, struct accs *accs,
 			continue;
 		struct aiv *aiv = &accs->aivs[asiz2idx(asiz)];
 		print_mask(prefixstr, aiv, accs->align);
-#if 0
+
 		struct enumer *enumer;
-		SIMPLEQ_FOREACH(enumer, enumers, entry) {
+		TAILQ_FOREACH(enumer, &enumerlist->head, entry) {
 			print_enumer(prefixstr, aiv, enumer);
 		}
-#endif
 	}
 }
 
@@ -330,7 +327,6 @@ print_mask(const char *prefixstr, const struct aiv *aiv, const int align)
 	}
 }
 
-#if 0
 /* Print enum constants. */
 static void
 print_enumer(const char *prefixstr, const struct aiv *aiv,
@@ -338,7 +334,7 @@ print_enumer(const char *prefixstr, const struct aiv *aiv,
 {
 	struct aiv v_storage, *v = &v_storage;
 	*v = *aiv;
-	v->sv.u.num.v = enumer->num.v;
+	v->sv.u.num.v = enumer->num;
 
 	char enumerstr[32];
 	print_vec(enumerstr, sizeof(enumerstr), v, num2vec);
@@ -348,7 +344,6 @@ print_enumer(const char *prefixstr, const struct aiv *aiv,
 #undef	A
 #undef	P
 }
-#endif
 
 static void
 print_vec(char *str, const size_t len, const struct aiv *aiv,
@@ -392,7 +387,6 @@ mask2vec(const struct aiv *aiv, struct aiv *vec)
 	}
 }
 
-#if 0
 static void
 num2vec(const struct aiv *aiv, struct aiv *vec)
 {
@@ -420,9 +414,9 @@ struct layout {
 
 static struct layout *dump_layout_alloc(void);
 static void dump_layout_free(struct layout *);
-static void dump_fields_addresses(struct layout *, int);
-static void dump_fields_bits(struct layout *, int);
-static void dump_fields_legend(void);
+static void dump_fieldlist_addresses(struct layout *, int);
+static void dump_fieldlist_bits(struct layout *, int);
+static void dump_fieldlist_legend(void);
 static int bits_index(const int, const int, int *);
 
 static void
@@ -438,20 +432,20 @@ dump(struct reg *prefix)
 	    name, global->cur_reg->size, global->target);
 	printf(" *\n");
 	printf(" * real memory layout:\n");
-	dump_fields_addresses(layout, 0);
-	dump_fields_bits(layout, 0);
+	dump_fieldlist_addresses(layout, 0);
+	dump_fieldlist_bits(layout, 0);
 	printf(" *\n");
 
 	int i;
 	for (i = MINASIZ; i <= MAXASIZ; i <<= 1) {
 		printf(" * %s endian memory layout view (%d-bit access):\n",
 		    (i == MINASIZ) ? "little" : "big", i);
-		dump_fields_addresses(layout, i);
-		dump_fields_bits(layout, i);
+		dump_fieldlist_addresses(layout, i);
+		dump_fieldlist_bits(layout, i);
 		printf(" *\n");
 	}
 
-	dump_fields_legend();
+	dump_fieldlist_legend();
 	printf(" */\n");
 
 	dump_layout_free(layout);
@@ -470,7 +464,7 @@ dump_layout_alloc(void)
 	struct field *field;
 	char C = 'a';
 	int i = 0;
-	SIMPLEQ_FOREACH(field, &global->cur_reg->fields, entry) {
+	TAILQ_FOREACH(field, &global->cur_reg->fieldlist->head, entry) {
 		int j;
 		for (j = 0; j < field->width; j++) {
 			const int x = global->target == ENDIAN_BIG ?
@@ -507,7 +501,7 @@ dump_layout_free(struct layout *layout)
 }
 
 static void
-dump_fields_addresses(struct layout *layout, int swap)
+dump_fieldlist_addresses(struct layout *layout, int swap)
 {
 	int i;
 
@@ -528,7 +522,7 @@ dump_fields_addresses(struct layout *layout, int swap)
 }
 
 static void
-dump_fields_bits(struct layout *layout, int swap)
+dump_fieldlist_bits(struct layout *layout, int swap)
 {
 	int i;
 
@@ -548,13 +542,13 @@ dump_fields_bits(struct layout *layout, int swap)
 }
 
 static void
-dump_fields_legend(void)
+dump_fieldlist_legend(void)
 {
 	struct field *field;
 	char C = 'a';
 
 	printf(" * ");
-	SIMPLEQ_FOREACH(field, &global->cur_reg->fields, entry) {
+	TAILQ_FOREACH(field, &global->cur_reg->fieldlist->head, entry) {
 		const char * const name =
 		    (field->name != NULL) ? field->name : "(unused)";
 		printf("%s%c:%d:%s",
@@ -576,4 +570,3 @@ bits_index(const int index, const int swap_size, int *rincr)
 		return (index & ~mask) + (swap_size - 1) - (index & mask);
 	}
 }
-#endif

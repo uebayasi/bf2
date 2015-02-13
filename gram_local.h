@@ -30,10 +30,15 @@ YYDECL0(sep,
 YYDECL1(comment,
 	const char *, text,
 );
+#define	reg_ext \
+	int type; \
+	int size; \
+	enum endian endian;
 YYDECL3(reg,
 	const char *, prefix,
 	struct paramlist *, paramlist,
 	struct fieldlist *, fieldlist,
+	reg_ext
 );
 YYDECL3(param,
 	int, type,
