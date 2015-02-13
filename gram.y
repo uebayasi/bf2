@@ -66,137 +66,78 @@ int yywrap(void);
 
 %%
 
-listlist:
-	{
+listlist: /* empty */ {
 		$$ = NULL;
-	}
-	|
-	listlist list
-	{
+	} | listlist list {
 		$$ = mklistlist($1, $2);
 		alllistlist = $$;
 	}
-list:
-	commentlist
-	{
+list: commentlist {
 		$$ = mklist($1, NULL);
-	}
-	|
-	sep
-	{
+	} | sep {
 		$$ = mklist(NULL, NULL);
-	}
-	|
-	reg
-	{
+	} | reg {
 		$$ = mklist(NULL, $1);
 	}
-sep:
-	SEP
-	{
+sep: SEP {
 		$$ = mksep();
 	}
-commentlist:
-	{
+commentlist: /* empty */ {
 		$$ = NULL;
-	}
-	|
-	commentlist comment
-	{
+	} | commentlist comment {
 		$$ = mkcommentlist($1, $2);
 	}
-comment:
-	COMMENT
-	{
+comment: COMMENT {
 		$$ = mkcomment(strdup(yytext));
 	}
-reg:
-	prefix paramlist fieldlist
-	{
+reg: prefix paramlist fieldlist {
 		$$ = mkreg($1, $2, $3);
 	}
-prefix:
-	kw_prefix id newline
-	{
+prefix: kw_prefix id newline {
 		$$ = strdup($2);
 	}
-paramlist:
-	{
+paramlist: /* empty */ {
 		$$ = NULL;
-	}
-	|
-	paramlist param
-	{
+	} | paramlist param {
 		$$ = mkparamlist($1, $2);
 	}
-param:
-	kw_size number newline
-	{
+param: kw_size number newline {
 		$$ = mkparam(PARAM_SIZE, $2, 0);
-	}
-	|
-	kw_endian endian newline
-	{
+	} | kw_endian endian newline {
 		$$ = mkparam(PARAM_ENDIAN, 0, $2);
 	}
-fieldlist:
-	{
+fieldlist: /* empty */ {
 		$$ = NULL;
-	}
-	|
-	fieldlist field
-	{
+	} | fieldlist field {
 		$$ = mkfieldlist($1, $2);
 	}
-field:
-	number id enumerlist newline
-	{
+field: number id enumerlist newline {
 		$$ = mkfield($1, $2, $3);
 	}
-enumerlist:
-	{
+enumerlist: /* empty */ {
 		$$ = NULL;
-	}
-	|
-	enumerlist enumer
-	{
+	} | enumerlist enumer {
 		$$ = mkenumerlist($1, $2);
 	}
-enumer:
-	number id
-	{
+enumer: number id {
 		$$ = mkenumer($1, $2);
 	}
-kw_prefix:
-	KW_PREFIX
-	;
-kw_size:
-	KW_SIZE
-	;
-endian:
-	ENDIAN
-	{
+kw_prefix: KW_PREFIX ;
+kw_size: KW_SIZE ;
+endian: ENDIAN {
 		if (yytext[0] == 'L' || yytext[0] == 'l')
 			$$ = ENDIAN_LITTLE;
 		else
 			$$ = ENDIAN_BIG;
 	}
-kw_endian:
-	KW_ENDIAN
-	;
-id:
-	ID
-	{
+kw_endian: KW_ENDIAN ;
+id: ID {
 		$$ = strdup(yytext);
 	}
-number:
-	NUMBER
-	{
+number: NUMBER {
 		$$ = atoi(yytext);
 	}
-newline:
-	NEWLINE
-	;
+newline: NEWLINE ;
 
 %%
 
