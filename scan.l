@@ -2,10 +2,10 @@
 #include "gram.h"
 %}
 
-kw_prefix	(PREFIX|prefix)
-kw_endian	(ENDIAN|endian)
-kw_size		(SIZE|size)
-kw_comment	(COMMENT|comment)
+kw_prefix	^(PREFIX|prefix)
+kw_endian	^(ENDIAN|endian)
+kw_size		^(SIZE|size)
+kw_comment	^(COMMENT|comment)
 id		[A-Za-z][A-Za-z0-9_]*
 number		[0-9][0-9]*
 char		.
