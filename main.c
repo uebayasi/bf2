@@ -11,6 +11,7 @@ main(int ac, char *av[])
 {
 	yyparse();
 
+	global->full = 0;	// XXX
 	global->asiz = 64;	// XXX
 
 	struct list *l;
@@ -21,16 +22,14 @@ main(int ac, char *av[])
 			struct field *f;
 			if (l->reg->fieldlist != NULL) {
 				TAILQ_FOREACH(f, &l->reg->fieldlist->head, entry) {
-					printf(" %s\n", f->name);
 					field_print(f);
 				}
 			}
 		}
 		if (l->commentlist != NULL) {
-			printf("list:comment\n");
 			struct comment *c;
 			TAILQ_FOREACH(c, &l->commentlist->head, entry) {
-				printf(" %s\n", c->text);
+				printf("// %s\n", c->text);
 			}
 		}
 	}
