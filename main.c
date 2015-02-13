@@ -16,7 +16,7 @@ main(int argc, char *argv[])
 	int c;
 	extern char *optarg;
 
-	while ((c = getopt(argc, argv, "a:fv")) != -1) {
+	while ((c = getopt(argc, argv, "a:BfLv")) != -1) {
 		int asiz;
 		switch (c) {
 		case 'a':
@@ -35,8 +35,14 @@ main(int argc, char *argv[])
 				/* NOTREACHED */
 			}
 			break;
+		case 'B':
+			global->target = ENDIAN_BIG;
+			break;
 		case 'f':
 			global->full = 1;
+			break;
+		case 'L':
+			global->target = ENDIAN_LITTLE;
 			break;
 		case 'v':
 			global->verbose = 1;
