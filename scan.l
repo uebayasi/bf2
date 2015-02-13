@@ -15,6 +15,7 @@ text		[^\n][^\n]*
 newline		[\n]
 ignoreline	^{blank}#?[^{newline}]*{newline}
 ignore		#.*{newline}
+emptyline	^{space}{newline}
 
 %s		_COMMENT
 
@@ -44,17 +45,20 @@ ignore		#.*{newline}
 {number} {
 	return NUMBER;
 }
-{ignoreline}	{
+{ignoreline} {
 	return SEP;
 }
-{ignore}	{
+{ignore} {
 	return SEP;
 }
-{newline}	{
+{emptyline} {
+	return SEP;
+}
+{newline} {
 	return NEWLINE;
 }
-{blank}		;
-.		{
+{blank} ;
+. {
 }
 
 %%

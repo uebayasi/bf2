@@ -36,10 +36,11 @@ YYDECL3(param,
 	int, size,
 	enum endian, endian,
 );
-YYDECL3(field,
+YYDECL4(field,
 	int, width,
 	const char *, name,
 	struct enumerlist *, enumerlist,
+	int, offset,
 );
 YYDECL2(enumer,
 	int, num,

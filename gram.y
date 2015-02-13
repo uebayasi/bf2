@@ -17,6 +17,8 @@ void procfield(struct field *, void *);
 
 void yyerror(const char *msg);
 int yywrap(void);
+
+struct field *prev_field;
 %}
 
 %union {
@@ -89,6 +91,7 @@ comment: COMMENT {
 		$$ = mkcomment(strdup(yytext));
 	}
 reg: prefix paramlist fieldlist {
+		prev_field = NULL;
 		$$ = mkreg($1, $2, $3);
 	}
 prefix: kw_prefix id newline {
@@ -115,9 +118,21 @@ fieldlist: /* empty */ {
 		$$ = mkfieldlist($1, $2);
 	}
 field: number id enumerlist newline {
-		$$ = mkfield($1, $2, $3);
+		int offset;
+		if (prev_field == NULL)
+			offset = 0;
+		else
+			offset = prev_field->offset + prev_field->width;
+		$$ = mkfield($1, $2, $3, offset);
+		prev_field = $$;
 	} | number newline {
-		$$ = mkfield($1, NULL, NULL);
+		int offset;
+		if (prev_field == NULL)
+			offset = 0;
+		else
+			offset = prev_field->offset + prev_field->width;
+		$$ = mkfield($1, NULL, NULL, offset);
+		prev_field = $$;
 	}
 enumerlist: /* empty */ {
 		$$ = NULL;
@@ -156,10 +171,11 @@ YYDEF3(param,
 	int, type,
 	int, size,
 	enum endian, endian)
-YYDEF3(field,
+YYDEF4(field,
 	int, width,
 	const char *, name,
-	struct enumerlist *, enumerlist)
+	struct enumerlist *, enumerlist,
+	int, offset)
 YYDEF2(enumer,
 	int, num,
 	const char *, name)
