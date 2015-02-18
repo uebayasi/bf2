@@ -58,6 +58,10 @@ main(int argc, char *argv[])
 		if (l->reg != NULL) {
 			global->cur_reg = l->reg;
 
+			if (l->reg->offset != 0) {
+				printf("#define %s 0x%x\n", l->reg->prefix,
+				    l->reg->offset & ~(1 << 31));
+			}
 			if (l->reg->fieldlist != NULL) {
 				struct field *f;
 				TAILQ_FOREACH(f, &l->reg->fieldlist->head, entry) {

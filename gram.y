@@ -45,6 +45,7 @@ struct field *prev_field;
 %token	KW_PREFIX
 %token	KW_SIZE
 %token	KW_ENDIAN
+%token	KW_OFFSET
 %token	ENDIAN
 %token	ID
 %token	NUMBER
@@ -107,6 +108,10 @@ param		: kw_size number newline { $$ = mkparam(PARAM_SIZE, $2, 0); }
 				endian = ENDIAN_BIG;
 			$$ = mkparam(PARAM_ENDIAN, 0, endian);
 		}
+		| kw_offset number newline {
+			$$ = mkparam(PARAM_OFFSET, 0, 0); // XXX
+			$$->offset = (1 << 31) | $2; // XXX
+		}
 
 fieldlist	: /* empty */ { $$ = NULL; }
 		| fieldlist field { $$ = mkfieldlist($1, $2); }
@@ -125,9 +130,11 @@ kw_size		: KW_SIZE ;
 
 kw_endian	: KW_ENDIAN ;
 
+kw_offset	: KW_OFFSET ;
+
 id		: ID { $$ = strdup(yytext); }
 
-number		: NUMBER { $$ = atoi(yytext); }
+number		: NUMBER { $$ = (int)strtol(yytext, NULL, 0); }
 
 newline		: NEWLINE ;
 
@@ -172,6 +179,9 @@ makereg(const char *prefix, struct paramlist *paramlist,
 			break;
 		case PARAM_ENDIAN:
 			reg->endian = param->endian;
+			break;
+		case PARAM_OFFSET:
+			reg->offset = param->offset;
 			break;
 		}
 	}

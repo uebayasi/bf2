@@ -17,6 +17,7 @@
 enum param_type {
 	PARAM_SIZE = 1,
 	PARAM_ENDIAN = 2,
+	PARAM_OFFSET = 3,
 };
 
 union param_value {
@@ -43,17 +44,21 @@ YYDECL1(comment,
 #define	reg_ext \
 	int type; \
 	int size; \
-	enum endian endian;
+	enum endian endian; \
+	int offset;
 YYDECL3(reg,
 	const char *, prefix,
 	struct paramlist *, paramlist,
 	struct fieldlist *, fieldlist,
 	reg_ext
 );
+#define	param_ext \
+	int offset;
 YYDECL3(param,
 	int, type,
 	int, size,
 	enum endian, endian,
+	param_ext
 );
 #define	field_ext \
 	struct mask mask;
