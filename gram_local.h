@@ -52,7 +52,7 @@ struct mask { int S; int E; };
 
 YYDECL3(list,
 	struct commentlist *, commentlist,
-	struct base *, base,
+	struct def *, def,
 	struct reg *, reg,
 );
 YYDECL0(sep,
@@ -60,8 +60,8 @@ YYDECL0(sep,
 YYDECL1(comment,
 	const char *, text,
 );
-YYDECL1(base,
-	long long, addr,
+YYDECL1(def,
+	long long, base,
 );
 #define	reg_ext \
 	int type; \

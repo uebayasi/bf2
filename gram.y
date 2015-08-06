@@ -46,7 +46,7 @@ struct field *prev_field;
 	struct commentlist *commentlist;
 	struct comment *comment;
 	struct sep *sep;
-	struct base *base;
+	struct def *def;
 	struct reg *reg;
 	struct paramlist *paramlist;
 	struct param *param;
@@ -75,7 +75,7 @@ struct field *prev_field;
 %type	<commentlist>	commentlist
 %type	<comment>	comment
 %type	<sep>		sep
-%type	<base>		base
+%type	<def>		def
 %type	<reg>		reg
 %type	<paramlist>	paramlist
 %type	<param>		param
@@ -99,7 +99,7 @@ listlist	: /* empty */ {
 
 list		: commentlist { $$ = mklist($1, NULL, NULL); }
 		| sep { $$ = mklist(NULL, NULL, NULL); }
-		| base { $$ = mklist(NULL, $1, NULL); }
+		| def { $$ = mklist(NULL, $1, NULL); }
 		| reg { $$ = mklist(NULL, NULL, $1); }
 
 sep		: SEP { $$ = mksep(); }
@@ -109,8 +109,8 @@ commentlist	: /* empty */ { $$ = NULL; }
 
 comment		: COMMENT { $$ = mkcomment(strdup(yytext)); }
 
-base		: kw_base number newline {
-			$$ = mkbase($2);
+def		: kw_base number newline {
+			$$ = mkdef($2);
 		}
 
 reg		: prefix paramlist fieldlist {
@@ -170,13 +170,13 @@ struct listlist *alllistlist;
 
 YYDEF3(list,
 	struct commentlist *, commentlist,
-	struct base *, base,
+	struct def *, def,
 	struct reg *, reg)
 YYDEF1(comment,
 	const char *, text)
 YYDEF0(sep)
-YYDEF1(base,
-	long long, addr)
+YYDEF1(def,
+	long long, base)
 YYDEF3(reg,
 	const char *, prefix,
 	struct paramlist *, paramlist,
