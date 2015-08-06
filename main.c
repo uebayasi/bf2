@@ -74,6 +74,20 @@ main(int argc, char *argv[])
 		if (l->reg != NULL) {
 			global->cur_reg = l->reg;
 
+			if (l->reg->size == 0) {
+				if (global->def.size == 0) {
+					// XXX error
+				} else {
+					l->reg->size = global->def.size;
+				}
+			}
+			if (l->reg->endian == 0) {
+				if (global->def.endian == 0) {
+					// XXX error
+				} else {
+					l->reg->endian = global->def.endian;
+				}
+			}
 			if (l->reg->offset != 0) {
 				printf("#define %s 0x%x\n", l->reg->prefix,
 				    l->reg->offset & ~(1 << 31));
@@ -83,6 +97,18 @@ main(int argc, char *argv[])
 				TAILQ_FOREACH(f, &l->reg->fieldlist->head, entry) {
 					field_print(f);
 				}
+			}
+		}
+		// Default
+		if (l->def != NULL) {
+			if (l->def->base != 0) {
+				global->def.base = l->def->base;
+			}
+			if (l->def->size != 0) {
+				global->def.size = l->def->size;
+			}
+			if (l->def->endian != 0) {
+				global->def.endian = l->def->endian;
 			}
 		}
 		// Comment

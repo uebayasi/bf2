@@ -60,8 +60,10 @@ YYDECL0(sep,
 YYDECL1(comment,
 	const char *, text,
 );
-YYDECL1(def,
+YYDECL3(def,
 	long long, base,
+	int, size,
+	enum endian, endian,
 );
 #define	reg_ext \
 	int type; \
@@ -105,6 +107,11 @@ struct global {
 	struct field *cur_field, *prev_field;
 	struct enumer *cur_enumer, *prev_enumer;
 	enum endian target;
+	struct {
+		long long base;
+		int size;
+		enum endian endian;
+	} def;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

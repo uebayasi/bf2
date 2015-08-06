@@ -110,7 +110,18 @@ commentlist	: /* empty */ { $$ = NULL; }
 comment		: COMMENT { $$ = mkcomment(strdup(yytext)); }
 
 def		: kw_base number newline {
-			$$ = mkdef($2);
+			$$ = mkdef($2, 0, 0);
+		}
+		| kw_size number newline {
+			$$ = mkdef(0, $2, 0);
+		}
+		| kw_endian id newline {
+			enum endian endian;
+			if ($2[0] == 'L' || $2[0] == 'l')
+				endian = ENDIAN_LITTLE;
+			else
+				endian = ENDIAN_BIG;
+			$$ = mkdef(0, 0, endian);
 		}
 
 reg		: prefix paramlist fieldlist {
@@ -175,8 +186,10 @@ YYDEF3(list,
 YYDEF1(comment,
 	const char *, text)
 YYDEF0(sep)
-YYDEF1(def,
-	long long, base)
+YYDEF3(def,
+	long long, base,
+	int, size,
+	enum endian, endian)
 YYDEF3(reg,
 	const char *, prefix,
 	struct paramlist *, paramlist,
@@ -201,7 +214,12 @@ makereg(const char *prefix, struct paramlist *paramlist,
 	struct param *param;
 
 	reg = mkreg(prefix, paramlist, fieldlist);
+	if (reg->paramlist == NULL)
+		goto paramlistdone;
 	TAILQ_FOREACH(param, &reg->paramlist->head, entry) {
+		if (param == NULL) {
+			break;
+		}
 		switch (param->type) {
 		case PARAM_SIZE:
 			reg->size = param->size;
@@ -214,6 +232,7 @@ makereg(const char *prefix, struct paramlist *paramlist,
 			break;
 		}
 	}
+paramlistdone:
 	return reg;
 }
 
