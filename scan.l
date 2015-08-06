@@ -18,6 +18,7 @@
 #include "gram.h"
 %}
 
+kw_base		^(BASE|base)
 kw_prefix	^(PREFIX|prefix)
 kw_endian	^(ENDIAN|endian)
 kw_size		^(SIZE|size)
@@ -47,6 +48,9 @@ ignore		#.*{newline}
 }
 <_COMMENT>{text} {
 	return COMMENT;
+}
+{kw_base} {
+	return KW_BASE;
 }
 {kw_prefix} {
 	return KW_PREFIX;

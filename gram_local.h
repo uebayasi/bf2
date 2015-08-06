@@ -15,6 +15,8 @@
  */
 
 ////////////////////////////////////////////////////////////////////////////////
+// XXX Generate this using DSL
+////////////////////////////////////////////////////////////////////////////////
 
 #include "yacc.h"
 
@@ -48,14 +50,18 @@ enum endian {
 
 struct mask { int S; int E; };
 
-YYDECL2(list,
+YYDECL3(list,
 	struct commentlist *, commentlist,
+	struct base *, base,
 	struct reg *, reg,
 );
 YYDECL0(sep,
 );
 YYDECL1(comment,
 	const char *, text,
+);
+YYDECL1(base,
+	long long, addr,
 );
 #define	reg_ext \
 	int type; \

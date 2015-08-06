@@ -46,6 +46,7 @@ struct field *prev_field;
 	struct commentlist *commentlist;
 	struct comment *comment;
 	struct sep *sep;
+	struct base *base;
 	struct reg *reg;
 	struct paramlist *paramlist;
 	struct param *param;
@@ -58,6 +59,7 @@ struct field *prev_field;
 }
 
 %token	COMMENT
+%token	KW_BASE
 %token	KW_PREFIX
 %token	KW_SIZE
 %token	KW_ENDIAN
@@ -73,6 +75,7 @@ struct field *prev_field;
 %type	<commentlist>	commentlist
 %type	<comment>	comment
 %type	<sep>		sep
+%type	<base>		base
 %type	<reg>		reg
 %type	<paramlist>	paramlist
 %type	<param>		param
@@ -94,9 +97,10 @@ listlist	: /* empty */ {
 			alllistlist = $$;
 		}
 
-list		: commentlist { $$ = mklist($1, NULL); }
-		| sep { $$ = mklist(NULL, NULL); }
-		| reg { $$ = mklist(NULL, $1); }
+list		: commentlist { $$ = mklist($1, NULL, NULL); }
+		| sep { $$ = mklist(NULL, NULL, NULL); }
+		| base { $$ = mklist(NULL, $1, NULL); }
+		| reg { $$ = mklist(NULL, NULL, $1); }
 
 sep		: SEP { $$ = mksep(); }
 
@@ -104,6 +108,10 @@ commentlist	: /* empty */ { $$ = NULL; }
 		| commentlist comment { $$ = mkcommentlist($1, $2); }
 
 comment		: COMMENT { $$ = mkcomment(strdup(yytext)); }
+
+base		: kw_base number newline {
+			$$ = mkbase($2);
+		}
 
 reg		: prefix paramlist fieldlist {
 			prev_field = NULL;
@@ -140,6 +148,8 @@ enumerlist	: /* empty */ { $$ = NULL; }
 
 enumer		: number id { $$ = mkenumer($1, $2); }
 
+kw_base		: KW_BASE ;
+
 kw_prefix	: KW_PREFIX ;
 
 kw_size		: KW_SIZE ;
@@ -158,12 +168,15 @@ newline		: NEWLINE ;
 
 struct listlist *alllistlist;
 
-YYDEF2(list,
+YYDEF3(list,
 	struct commentlist *, commentlist,
+	struct base *, base,
 	struct reg *, reg)
 YYDEF1(comment,
 	const char *, text)
 YYDEF0(sep)
+YYDEF1(base,
+	long long, addr)
 YYDEF3(reg,
 	const char *, prefix,
 	struct paramlist *, paramlist,

@@ -95,7 +95,7 @@ main(int argc, char *argv[])
 			printf(" */\n");
 		}
 		// Separator
-		if (l->reg == NULL && l->commentlist == NULL) {
+		if (l->reg == NULL && l->base == NULL && l->commentlist == NULL) {
 			putchar('\n');
 		}
 	}
