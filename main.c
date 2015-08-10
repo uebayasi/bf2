@@ -68,6 +68,8 @@ main(int argc, char *argv[])
 
 	yyparse();
 
+	global->asiz = global->maxsize;
+
 	struct list *l;
 	TAILQ_FOREACH(l, &alllistlist->head, entry) {
 		// Register

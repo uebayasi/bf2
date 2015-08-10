@@ -107,6 +107,7 @@ struct global {
 	struct field *cur_field, *prev_field;
 	struct enumer *cur_enumer, *prev_enumer;
 	enum endian target;
+	int maxsize;
 	struct {
 		long long base;
 		int size;

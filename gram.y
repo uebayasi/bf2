@@ -114,6 +114,9 @@ def		: kw_base number newline {
 		}
 		| kw_size number newline {
 			$$ = mkdef(0, $2, 0);
+			if ($$->size > global->maxsize) {
+				global->maxsize = $$->size;
+			}
 		}
 		| kw_endian id newline {
 			enum endian endian;
@@ -127,6 +130,9 @@ def		: kw_base number newline {
 reg		: prefix paramlist fieldlist {
 			prev_field = NULL;
 			$$ = makereg($1, $2, $3);
+			if ($$->size > global->maxsize) {
+				global->maxsize = $$->size;
+			}
 		}
 
 prefix		: kw_prefix id newline { $$ = strdup($2); }

@@ -222,7 +222,6 @@ print_accs(const char *prefixstr, struct accs *accs,
 	/* Provide all access widths >minasiz. */
 	int asiz;
 	for (asiz = accs->minasiz; asiz <= MAXASIZ; asiz <<= 1) {
-		/* Follow explicit access sizes when specified. */
 		if (global->asiz != 0 && (global->asiz & asiz) == 0)
 			continue;
 		struct aiv *aiv = &accs->aivs[asiz2idx(asiz)];
